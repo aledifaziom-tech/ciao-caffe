@@ -884,7 +884,7 @@ function semilla(st){
    para que dos ventas simultaneas descuenten bien. */
 
 var FDB = null, FAUTH = null, ROL = null, MAIL = null;
-var shadow = null, escuchando = false;
+var shadow = null, escuchando = false, SIN_ACCESO = {};
 var INC = function(n){ return firebase.firestore.FieldValue.increment(n); };
 
 /* Ventanas de carga: se traen los datos recientes, no el historico
@@ -931,6 +931,7 @@ function guardar(){
   }
 
   COLS.forEach(function(nom){
+    if(SIN_ACCESO[nom]) return;
     var ahora = porId(S[nom]), antes = porId(shadow[nom]), id, k;
     for(id in ahora){
       var a = ahora[id], b = antes[id];
@@ -969,6 +970,12 @@ function cargar(){
   COLS.forEach(function(nom){
     jobs.push(consulta(nom).get().then(function(qs){
       st[nom] = qs.docs.map(function(d){ var o = d.data(); o.id = d.id; return o; });
+    }).catch(function(e){
+      /* Si el rol no tiene permiso sobre esta coleccion, se sigue sin ella
+         en vez de dejar al usuario afuera. */
+      console.warn("Sin acceso a " + nom + ":", e.code || e);
+      st[nom] = [];
+      SIN_ACCESO[nom] = true;
     }));
   });
 
@@ -1006,6 +1013,7 @@ var repintarPronto = (function(){
 function escuchar(){
   escuchando = true;
   COLS.forEach(function(nom){
+    if(SIN_ACCESO[nom]) return;
     consulta(nom).onSnapshot(function(qs){
       if(qs.metadata.hasPendingWrites) return;   // es un cambio nuestro, ya esta en S
       S[nom] = qs.docs.map(function(d){ var o = d.data(); o.id = d.id; return o; });
@@ -2165,10 +2173,13 @@ if(!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.indexOf("PEGA_AQUI") === 0)
         $("#tasaIn").value = S.config.tasa;
         avisoTasa();
         entrar();
+      }).catch(function(e){
+        console.error(e);
+        abrirLogin("No se pudieron cargar los datos: " + (e.code || e.message || e));
       });
     }).catch(function(e){
       console.error(e);
-      abrirLogin("No se pudo leer tu rol. Revisa las reglas de Firestore.");
+      abrirLogin("No se pudo leer tu rol: " + (e.code || e.message || e));
     });
   });
 }

@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function auth() {
+      return request.auth != null;
+    }
+    function rol() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
+    }
+    function admin() {
+      return auth() && rol() == 'admin';
+    }
+
+    match /usuarios/{uid} {
+      allow read: if auth() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /config/{doc} {
+      allow read: if auth();
+      allow create, delete: if admin();
+      allow update: if admin()
+        || (auth() && doc == 'tasas')
+        || (auth() && doc == 'general'
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['correlativo','tasa','tasaFecha','tasaFuente']));
+    }
+
+    // ===== Caja nueva (index.html) =====
+
+    // Productos: solo el admin crea, edita y borra.
+    // La caja solo puede mover el stock (vender, reponer, contar).
+    match /caja_productos/{doc} {
+      allow read: if auth();
+      allow create, delete: if admin();
+      allow update: if admin()
+        || (auth() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock']));
+    }
+
+    // Ventas: un documento por día. La caja solo puede AGREGAR ventas;
+    // anular o cambiar una venta ya hecha queda para el admin.
+    match /caja_ventas/{dia} {
+      allow read: if auth();
+      allow create: if auth();
+      allow update: if admin()
+        || (auth()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ventas'])
+            && request.resource.data.ventas.diff(resource.data.ventas).changedKeys().size() == 0
+            && request.resource.data.ventas.diff(resource.data.ventas).removedKeys().size() == 0);
+      allow delete: if admin();
+    }
+
+    // ===== Sistema anterior (anterior.html) =====
+
+    match /productos/{doc} {
+      allow read: if auth();
+      allow write: if admin();
+    }
+
+    match /insumos/{doc} {
+      allow read: if auth();
+      allow update: if auth();
+      allow create, delete: if admin();
+    }
+
+    match /ventas/{doc} {
+      allow read, create: if auth();
+      allow update, delete: if admin();
+    }
+
+    match /movs/{doc} {
+      allow read, create: if auth();
+      allow update, delete: if admin();
+    }
+
+    match /cierres/{doc} {
+      allow read, create: if auth();
+      allow update, delete: if admin();
+    }
+
+    match /gastos/{doc} {
+      allow read, write: if admin();
+    }
+  }
+}

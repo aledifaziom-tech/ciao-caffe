@@ -655,7 +655,12 @@ function msgError(e){
 var toastT=null;
 function toast(txt,tono){var t=$('#toast');t.textContent=txt;t.className='toast ver'+(tono?' '+tono:'');clearTimeout(toastT);toastT=setTimeout(function(){t.className='toast'+(tono?' '+tono:'');},3000);}
 function aviso(txt,tono){var a=$('#aviso');a.textContent=txt;a.className='aviso'+(tono==='bad'?' bad':'');a.hidden=false;}
-function quitarAviso(){$('#aviso').hidden=true;}
+function quitarAviso(){$('#aviso').hidden=true;S.avisoEsRol=false;}
+function avisoRol(){
+  var raw=S.rolMalEscrito,limpio=String(raw).trim().toLowerCase();
+  aviso('El rol de '+S.nombre+' en Firebase dice “'+raw+'”'+(limpio==='admin'?', con mayúsculas, espacios o comillas de más':'')+'. Por eso entra como caja. Escríbelo exactamente admin o caja, en minúsculas.','bad');
+  S.avisoEsRol=true;
+}
 function renderSync(){
   var el=$('#sync');
   if(!S.db){el.hidden=true;return;}
@@ -1220,7 +1225,7 @@ function conectar(){
   subs.push(S.db.collection(COL_PROD).onSnapshot(function(snap){
     var m=new Map();snap.docs.forEach(function(d){m.set(d.id,Object.assign({id:d.id},d.data()));});
     S.productos=m;
-    if(!snap.metadata.fromCache||snap.docs.length){S.productosListos=true;clearTimeout(timerConexion);if(!S.faltanPermisos)quitarAviso();}
+    if(!snap.metadata.fromCache||snap.docs.length){S.productosListos=true;clearTimeout(timerConexion);if(!S.faltanPermisos){if(S.rolMalEscrito)avisoRol();else quitarAviso();}}
     renderTodo();
   },function(e){
     clearTimeout(timerConexion);S.productosListos=true;
@@ -1401,19 +1406,37 @@ try{
   mostrarLogin('No se pudo iniciar la conexión con Firebase. Recarga la página.');
 }
 if(FB.auth){
+  /* El rol se escucha en vivo: si se cambia en Firestore, la página lo
+     aplica al momento, sin tener que salir y volver a entrar. Solo cuenta
+     el valor exacto "admin", igual que en las reglas de Firebase. */
+  var unsubRol=null;
   FB.auth.onAuthStateChanged(function(u){
+    if(unsubRol){unsubRol();unsubRol=null;}
     if(!u){desconectar();aplicarRol();renderTodo();mostrarLogin();return;}
     S.mail=u.email||'';S.nombre=nombreDeCorreo(S.mail);
-    FB.db.collection('usuarios').doc(u.uid).get().then(function(d){
-      var rol=d.exists&&d.data().rol;
-      if(!rol){FB.auth.signOut();mostrarLogin('Esta cuenta no tiene rol asignado en Firebase.');return;}
-      S.rol=rol==='admin'?'admin':'caja';
-      $('#login').hidden=true;$('#lgPass').value='';LG.pin='';LG.enviando=false;pintarPin();errLogin('');
-      var cb=$('#btnCuenta');cb.innerHTML='<span class="cuenta-btn">'+esc(inicial(S.nombre))+'</span>';cb.setAttribute('aria-label','Mi cuenta: '+S.nombre);
-      aplicarRol();
-      setVista(S.vista,true);
-      conectar();
-    }).catch(function(e){mostrarLogin('No se pudo leer tu cuenta. '+msgError(e));});
+    var primero=true;
+    unsubRol=FB.db.collection('usuarios').doc(u.uid).onSnapshot(function(d){
+      var raw=d.exists?d.data().rol:null;
+      if(raw==null||raw===''){
+        if(d.metadata.fromCache)return;
+        FB.auth.signOut();mostrarLogin('Esta cuenta no tiene rol asignado en Firebase.');return;
+      }
+      var limpio=String(raw).trim().toLowerCase();
+      var antes=S.rol;
+      S.rol=raw==='admin'?'admin':'caja';
+      S.rolMalEscrito=(raw!=='admin'&&raw!=='caja')?String(raw):'';
+      if(primero){
+        primero=false;
+        $('#login').hidden=true;$('#lgPass').value='';LG.pin='';LG.enviando=false;pintarPin();errLogin('');
+        var cb=$('#btnCuenta');cb.innerHTML='<span class="cuenta-btn">'+esc(inicial(S.nombre))+'</span>';cb.setAttribute('aria-label','Mi cuenta: '+S.nombre);
+        aplicarRol();setVista(S.vista,true);conectar();
+      }else if(antes!==S.rol){
+        aplicarRol();renderTodo();
+        toast(S.rol==='admin'?'Ahora entras como administrador.':'Ahora entras como caja.','ok');
+      }
+      if(S.rolMalEscrito)avisoRol();
+      else if(S.avisoEsRol){S.avisoEsRol=false;quitarAviso();}
+    },function(e){if(primero)mostrarLogin('No se pudo leer tu cuenta. '+msgError(e));});
   });
 }
 })();

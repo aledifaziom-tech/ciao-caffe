@@ -51,6 +51,18 @@ service cloud.firestore {
       allow delete: if admin();
     }
 
+    // Mesas: pedidos abiertos. Todo el equipo puede abrir, agregar,
+    // marcar entregado, cobrar y anular (aún no son ventas).
+    match /caja_pedidos/{id} {
+      allow read, write: if auth();
+    }
+
+    // Ajustes de la caja (cantidad de mesas): solo el admin los cambia.
+    match /caja_config/{doc} {
+      allow read: if auth();
+      allow write: if admin();
+    }
+
     // ===== Sistema anterior (anterior.html) =====
 
     match /productos/{doc} {

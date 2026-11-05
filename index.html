@@ -1660,7 +1660,7 @@ function suscribirRango(){
   S.rango=rangoActual();S.ventasRango=[];S.rangoListo=false;S.rangoLento=false;S.rangoError='';S.abierta=null;S.confirmar=null;
   var a=S.rango[0],b=S.rango[1];
   timerRango=setTimeout(function(){if(!S.rangoListo){S.rangoLento=true;renderVentas();}},10000);
-  unsubRango=S.db.collection(COL_VENT).where('dia','>=',a).where('dia','<=',b).onSnapshot(function(snap){
+  unsubRango=S.db.collection(COL_VENT).where('dia','>=',a).where('dia','<=',b).onSnapshot({includeMetadataChanges:true},function(snap){
     S.ventasRango=snap.docs.map(function(d){return Object.assign({dia:d.id},d.data()||{});});
     if(!snap.metadata.fromCache){S.rangoListo=true;S.rangoLento=false;clearTimeout(timerRango);}
     else if(snap.docs.length)S.rangoListo=true;
@@ -1671,11 +1671,13 @@ function suscribirRango(){
 function conectar(){
   S.db=FB.db;
   clearTimeout(timerConexion);
-  timerConexion=setTimeout(function(){if(!S.productosListos)aviso('No hay conexión por ahora. Puedes seguir cobrando: las ventas se guardan en este equipo y se suben solas al volver la señal.');},10000);
-  subs.push(S.db.collection(COL_PROD).onSnapshot(function(snap){
+  S.nubeOk=false;
+  timerConexion=setTimeout(function(){if(!S.nubeOk)aviso('No hay conexión con la nube por ahora. Puedes seguir cobrando: las ventas se guardan en este equipo y se suben solas al volver la señal.');},12000);
+  subs.push(S.db.collection(COL_PROD).onSnapshot({includeMetadataChanges:true},function(snap){
     var m=new Map();snap.docs.forEach(function(d){m.set(d.id,Object.assign({id:d.id},d.data()));});
     S.productos=m;
-    if(!snap.metadata.fromCache||snap.docs.length){S.productosListos=true;clearTimeout(timerConexion);if(!S.faltanPermisos){if(S.rolMalEscrito)avisoRol();else quitarAviso();}}
+    S.productosListos=true;
+    if(!snap.metadata.fromCache&&!S.nubeOk){S.nubeOk=true;clearTimeout(timerConexion);if(!S.faltanPermisos){if(S.rolMalEscrito)avisoRol();else quitarAviso();}}
     renderTodo();
   },function(e){
     clearTimeout(timerConexion);S.productosListos=true;
@@ -1683,12 +1685,12 @@ function conectar(){
     else aviso('No se pudieron cargar los productos. '+msgError(e),'bad');
     renderTodo();
   }));
-  subs.push(S.db.collection('config').doc('general').onSnapshot(function(d){
+  subs.push(S.db.collection('config').doc('general').onSnapshot({includeMetadataChanges:true},function(d){
     if(d.exists){var c=d.data()||{};S.config={tasa:Number(c.tasa)||0,tasaFecha:c.tasaFecha||'',tasaFuente:c.tasaFuente||''};}
     renderTasa();renderGrid();renderCarrito();renderProductos();
     if(!d.metadata.fromCache)revisarTasa();
   },function(){}));
-  subs.push(S.db.collection(COL_PED).onSnapshot(function(snap){
+  subs.push(S.db.collection(COL_PED).onSnapshot({includeMetadataChanges:true},function(snap){
     var m=new Map();
     snap.docs.forEach(function(d){
       var x=d.data()||{};m.set(d.id,x);
@@ -1905,7 +1907,7 @@ if(FB.auth){
     if(!u){desconectar();aplicarRol();renderTodo();mostrarLogin();return;}
     S.mail=u.email||'';S.nombre=nombreDeCorreo(S.mail);
     var primero=true;
-    unsubRol=FB.db.collection('usuarios').doc(u.uid).onSnapshot(function(d){
+    unsubRol=FB.db.collection('usuarios').doc(u.uid).onSnapshot({includeMetadataChanges:true},function(d){
       var raw=d.exists?d.data().rol:null;
       if(raw==null||raw===''){
         if(d.metadata.fromCache)return;

@@ -181,6 +181,29 @@ label.campo{display:block;font-size:13px;font-weight:650;color:var(--muted);marg
 .login-caja p{margin:-8px 0 0}
 .login-caja .btn{width:100%;min-height:50px;font-size:16px}
 .err{color:var(--bad);font-weight:600}
+.login-caja .err{text-align:center}
+.lg-usuarios{display:grid;gap:10px}
+.lg-usuario{display:flex;align-items:center;gap:14px;padding:12px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);font-weight:650;font-size:17px;text-align:left;min-height:66px}
+.lg-usuario:hover{border-color:var(--brand)}
+.lg-usuario svg{margin-left:auto;width:18px;height:18px;color:var(--muted)}
+.lg-alt{align-self:center}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--cat,var(--brand)) 16%,var(--surface));color:color-mix(in srgb,var(--cat,var(--brand)) 85%,var(--text));font-family:var(--f-display);font-weight:800;font-size:19px;flex:none}
+.lg-quien{display:flex;align-items:center;gap:14px}
+.lg-quien h1{font-size:25px}
+.lg-quien .link{padding:2px 0}
+.lg-ayuda{margin:0!important;text-align:center}
+.pin-puntos{display:flex;justify-content:center;gap:14px;padding:4px 0}
+.pin-puntos i{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);transition:background .1s}
+.pin-puntos i.lleno{background:var(--brand);border-color:var(--brand)}
+.pin-puntos.mal{animation:sacudir .35s}
+@keyframes sacudir{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.teclado{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.teclado button{min-height:62px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);font-family:var(--f-display);font-stretch:108%;font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;display:grid;place-items:center}
+.teclado button:active{background:var(--brand-soft);border-color:var(--brand)}
+.teclado button[disabled]{opacity:.5}
+.teclado .t-borrar{background:transparent;border-color:transparent;color:var(--muted)}
+.teclado .t-borrar svg{width:26px;height:26px}
+.cuenta-btn{font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--brand)}
 
 /* ===== Vender ===== */
 .hoy{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;margin-bottom:14px}
@@ -491,19 +514,44 @@ label.campo{display:block;font-size:13px;font-weight:650;color:var(--muted);marg
 </div>
 
 <div class="login" id="login" hidden>
-  <form class="login-caja" id="formLogin" novalidate>
+  <div class="login-caja">
     <div class="marca">
       <span class="bandera" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="marca-nombre">Ciao Caffè</span>
       <span class="marca-sub">Caja</span>
     </div>
-    <h1>Entrar</h1>
-    <p class="muted">Usa la cuenta de administrador o la de caja.</p>
-    <div><label class="campo" for="lgMail">Correo</label><input class="inp" id="lgMail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
-    <div><label class="campo" for="lgPass">Contraseña</label><input class="inp" id="lgPass" type="password" autocomplete="current-password"></div>
-    <div class="err" id="lgErr" hidden></div>
-    <button type="submit" class="btn btn-primary" id="lgBtn">Entrar</button>
-  </form>
+
+    <div id="lgPaso1" class="pila">
+      <h1>¿Quién entra?</h1>
+      <div class="lg-usuarios" id="lgUsuarios"></div>
+      <button type="button" class="link lg-alt" id="lgConCorreo">Entrar con correo</button>
+    </div>
+
+    <div id="lgPaso2" class="pila" hidden>
+      <div class="lg-quien">
+        <span class="avatar" id="lgAvatar"></span>
+        <div><h1 id="lgNombre"></h1><button type="button" class="link" id="lgCambiar">Cambiar de usuario</button></div>
+      </div>
+      <p class="muted lg-ayuda">Escribe tu clave de 6 dígitos.</p>
+      <div class="pin-puntos" id="pinPuntos" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="teclado" id="teclado" role="group" aria-label="Teclado numérico">
+        <button type="button" data-tecla="1">1</button><button type="button" data-tecla="2">2</button><button type="button" data-tecla="3">3</button>
+        <button type="button" data-tecla="4">4</button><button type="button" data-tecla="5">5</button><button type="button" data-tecla="6">6</button>
+        <button type="button" data-tecla="7">7</button><button type="button" data-tecla="8">8</button><button type="button" data-tecla="9">9</button>
+        <span></span><button type="button" data-tecla="0">0</button><button type="button" data-tecla="borrar" class="t-borrar" aria-label="Borrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7 6-7Z"/><path d="m12.5 9.5 5 5M17.5 9.5l-5 5"/></svg></button>
+      </div>
+    </div>
+
+    <form id="formLogin" class="pila" novalidate hidden>
+      <h1>Entrar con correo</h1>
+      <div><label class="campo" for="lgMail">Correo</label><input class="inp" id="lgMail" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+      <div><label class="campo" for="lgPass">Contraseña</label><input class="inp" id="lgPass" type="password" autocomplete="current-password"></div>
+      <button type="submit" class="btn btn-primary" id="lgBtn">Entrar</button>
+      <button type="button" class="link lg-alt" id="lgVolver">Volver a los usuarios</button>
+    </form>
+
+    <div class="err" id="lgErr" role="alert" hidden></div>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -786,7 +834,7 @@ function cobrar(){
   if(m.bs&&!t){toast('Carga la tasa BCV antes de cobrar en bolívares.','bad');abrirTasa();return;}
   var lineas=items.map(function(i){return {p:i.p.id,n:i.p.nombre,cat:catNombre(i.p.categoria),precio:r2(i.p.precio),cant:i.cant};});
   var total=lineas.reduce(function(a,l){return a+cents(l.precio)*l.cant;},0)/100;
-  var venta={id:uid(),hora:new Date().toISOString(),items:lineas,total:total,tasa:t,totalBs:r2(total*t),metodo:S.metodo,ref:m.ref?$('#inpRef').value.trim().slice(0,40):'',anulada:false,usuario:S.mail||''};
+  var venta={id:uid(),hora:new Date().toISOString(),items:lineas,total:total,tasa:t,totalBs:r2(total*t),metodo:S.metodo,ref:m.ref?$('#inpRef').value.trim().slice(0,40):'',anulada:false,usuario:S.nombre||S.mail||''};
   var dia=hoy();
   if(dia!==S.hoyId)suscribirHoy();
   var lote=S.db.batch();
@@ -892,7 +940,7 @@ function htmlVenta(v){
     '</button>';
   if(abierta){
     h+='<div class="v-det"><div class="v-det-lineas">'+v.items.map(function(i){return '<div><span>'+i.cant+'× '+esc(i.n)+' <span class="muted">('+usd(i.precio)+')</span></span><span class="num">'+usd(cents(i.precio)*i.cant/100)+'</span></div>';}).join('')+'</div>'+
-      '<div class="v-det-info">'+(v.tasa?bs(v.totalBs)+' a '+fmt.format(v.tasa)+' Bs/$':'Sin tasa registrada')+(v.ref?' · Ref. '+esc(v.ref):'')+'</div>';
+      '<div class="v-det-info">'+(v.tasa?bs(v.totalBs)+' a '+fmt.format(v.tasa)+' Bs/$':'Sin tasa registrada')+(v.ref?' · Ref. '+esc(v.ref):'')+(v.usuario?' · Cobró '+esc(String(v.usuario).indexOf('@')>-1?nombreDeCorreo(v.usuario):v.usuario):'')+'</div>';
     if(!v.anulada&&esAdmin()){
       if(S.confirmar===v.id){
         h+='<div class="confirma"><p>¿Anular esta venta? Deja de contar en los totales y el stock vuelve.</p><button type="button" class="btn btn-sec sm" data-noanular="1">No</button><button type="button" class="btn btn-danger sm" data-anular="'+esc(v.id)+'" data-dia="'+esc(v.dia)+'">Sí, anular</button></div>';
@@ -1023,10 +1071,10 @@ function abrirTasa(){
 /* ---------- Cuenta ---------- */
 function abrirCuenta(){
   abrirModal('Mi cuenta',
-    '<div class="pila"><div class="cuenta-info"><span class="r-lbl">'+(esAdmin()?'Administrador':'Caja')+'</span><b>'+esc(S.mail||'—')+'</b></div>'+
+    '<div class="pila"><div class="cuenta-info lg-quien"><span class="avatar">'+esc(inicial(S.nombre))+'</span><div><span class="r-lbl">'+(esAdmin()?'Administrador':'Caja')+'</span><b>'+esc(S.nombre||S.mail||'—')+'</b></div></div>'+
     (esAdmin()?'<p class="muted" style="margin:0">El sistema anterior, con recetas, gastos y cierres, sigue disponible en <a href="/anterior.html" style="color:var(--brand)">ciao-caffe-amber.vercel.app/anterior.html</a>.</p>':'')+
-    '<div class="modal-acc"><button type="button" class="btn btn-danger-ghost" id="c-salir">Cerrar sesión</button></div></div>',
-    function(){$('#c-salir').addEventListener('click',function(){cerrarModal();FB.auth.signOut();});});
+    '<div class="modal-acc"><button type="button" class="btn btn-primary" id="c-cambiar">Cambiar de usuario</button></div></div>',
+    function(){$('#c-cambiar').addEventListener('click',function(){cerrarModal();LG.iniciado=true;LG.usuario=null;errLogin('');pasoLogin(1);FB.auth.signOut();});});
 }
 
 /* ---------- Productos ---------- */
@@ -1193,7 +1241,7 @@ function desconectar(){
   subs.forEach(function(f){try{f();}catch(e){}});subs=[];
   if(unsubHoy){unsubHoy();unsubHoy=null;}
   if(unsubRango){unsubRango();unsubRango=null;}
-  S.db=null;S.rol=null;S.mail='';S.productos=new Map();S.productosListos=false;S.faltanPermisos=false;
+  S.db=null;S.rol=null;S.mail='';S.nombre='';S.productos=new Map();S.productosListos=false;S.faltanPermisos=false;
   S.hoyDoc=null;S.ventasRango=[];S.rangoListo=false;S.carrito.clear();S.tasaIntentada=false;
   quitarAviso();cerrarModal();cerrarHoja();
 }
@@ -1202,8 +1250,8 @@ function desconectar(){
 function descargarCsv(){
   var vs=ventasPlanas().slice().reverse();
   var num=function(n){return fmtPlano.format(Number(n)||0);};
-  var filas=[['Fecha','Hora','Venta','Producto','Categoría','Cantidad','Precio $','Subtotal $','Total venta $','Forma de pago','Referencia','Tasa BCV','Total venta Bs','Estado']];
-  vs.forEach(function(v){v.items.forEach(function(i){filas.push([v.dia,horaDe(v.hora),v.id,i.n,i.cat||'',i.cant,num(i.precio),num(cents(i.precio)*i.cant/100),num(v.total),metodoDe(v.metodo).nombre,v.ref||'',num(v.tasa),num(v.totalBs),v.anulada?'Anulada':'Válida']);});});
+  var filas=[['Fecha','Hora','Venta','Producto','Categoría','Cantidad','Precio $','Subtotal $','Total venta $','Forma de pago','Referencia','Tasa BCV','Total venta Bs','Cobró','Estado']];
+  vs.forEach(function(v){v.items.forEach(function(i){filas.push([v.dia,horaDe(v.hora),v.id,i.n,i.cat||'',i.cant,num(i.precio),num(cents(i.precio)*i.cant/100),num(v.total),metodoDe(v.metodo).nombre,v.ref||'',num(v.tasa),num(v.totalBs),v.usuario||'',v.anulada?'Anulada':'Válida']);});});
   var csv='﻿'+filas.map(function(f){return f.map(function(c){var s=String(c);return /[;"\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(';');}).join('\r\n');
   var r=S.rango||rangoActual();
   var nombre=r[0]===r[1]?'ventas-ciao-caffe-'+r[0]+'.csv':'ventas-ciao-caffe-'+r[0]+'-a-'+r[1]+'.csv';
@@ -1212,25 +1260,90 @@ function descargarCsv(){
   setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);
 }
 
-/* ---------- Login ---------- */
-function mostrarLogin(msg){
-  $('#login').hidden=false;
-  var e=$('#lgErr');if(msg){e.textContent=msg;e.hidden=false;}else e.hidden=true;
+/* ---------- Login ----------
+   Cada persona elige su nombre y escribe su clave de 6 dígitos. Por dentro
+   es una cuenta de Firebase con un correo interno (nombre@ciaocaffe.com)
+   que nadie tiene que escribir. Las claves viven solo en Firebase. */
+var USUARIOS=[
+  {id:'alessandro',nombre:'Alessandro',color:2},
+  {id:'fabrizio',nombre:'Fabrizio',color:3},
+  {id:'gabriel',nombre:'Gabriel',color:1}
+];
+var DOMINIO='@ciaocaffe.com';
+var LG={usuario:null,pin:'',enviando:false};
+function correoDe(id){return id+DOMINIO;}
+function usuarioDeCorreo(m){m=String(m||'').toLowerCase();return USUARIOS.filter(function(u){return correoDe(u.id)===m;})[0]||null;}
+function nombreDeCorreo(m){var u=usuarioDeCorreo(m);return u?u.nombre:(String(m||'').split('@')[0]||'—');}
+function inicial(n){return String(n||'?').trim().charAt(0).toUpperCase()||'?';}
+function errLogin(msg){var e=$('#lgErr');if(msg){e.textContent=msg;e.hidden=false;}else e.hidden=true;}
+function pasoLogin(n){
+  $('#lgPaso1').hidden=n!==1;$('#lgPaso2').hidden=n!==2;$('#formLogin').hidden=n!==3;
+  if(n===2&&LG.usuario){$('#lgNombre').textContent=LG.usuario.nombre;var a=$('#lgAvatar');a.textContent=inicial(LG.usuario.nombre);a.style.setProperty('--cat','var(--cat-'+LG.usuario.color+')');}
+  LG.pin='';LG.enviando=false;pintarPin();
   var b=$('#lgBtn');b.disabled=false;b.textContent='Entrar';
 }
-function errorLogin(c){
-  if(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found'||c==='auth/invalid-login-credentials')return 'Correo o contraseña incorrectos.';
+function pintarPin(){
+  $$('#pinPuntos i').forEach(function(el,i){el.classList.toggle('lleno',i<LG.pin.length);});
+  $$('#teclado button').forEach(function(b){b.disabled=LG.enviando;});
+}
+function mostrarLogin(msg){
+  $('#login').hidden=false;
+  if(!LG.iniciado){
+    LG.iniciado=true;
+    var ult=null;try{ult=localStorage.getItem('caja:ultimo');}catch(e){}
+    LG.usuario=USUARIOS.filter(function(u){return u.id===ult;})[0]||null;
+    pasoLogin(LG.usuario?2:1);
+  }else{LG.pin='';LG.enviando=false;pintarPin();var b=$('#lgBtn');b.disabled=false;b.textContent='Entrar';}
+  errLogin(msg||'');
+}
+function errorAuth(c,conPin){
+  if(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found'||c==='auth/invalid-login-credentials')return conPin?'Clave incorrecta.':'Correo o contraseña incorrectos.';
   if(c==='auth/invalid-email')return 'Ese correo no tiene un formato válido.';
   if(c==='auth/too-many-requests')return 'Demasiados intentos. Espera unos minutos y vuelve a probar.';
   if(c==='auth/network-request-failed')return 'Sin conexión. Revisa el internet e intenta de nuevo.';
   return 'No se pudo entrar. Intenta de nuevo.';
 }
+function tecla(t){
+  if(LG.enviando||$('#lgPaso2').hidden)return;
+  if(t==='borrar'){LG.pin=LG.pin.slice(0,-1);pintarPin();return;}
+  if(!/^\d$/.test(t)||LG.pin.length>=6)return;
+  LG.pin+=t;errLogin('');pintarPin();
+  if(LG.pin.length===6)enviarPin();
+}
+function enviarPin(){
+  if(!LG.usuario||!FB.auth)return;
+  LG.enviando=true;pintarPin();
+  var pin=LG.pin;
+  FB.auth.signInWithEmailAndPassword(correoDe(LG.usuario.id),pin).catch(function(e){
+    LG.enviando=false;LG.pin='';pintarPin();
+    var p=$('#pinPuntos');p.classList.remove('mal');void p.offsetWidth;p.classList.add('mal');
+    errLogin(errorAuth(e&&e.code,true));
+  });
+}
+$('#lgUsuarios').innerHTML=USUARIOS.map(function(u){
+  return '<button type="button" class="lg-usuario" data-usuario="'+u.id+'"><span class="avatar" style="--cat:var(--cat-'+u.color+')">'+inicial(u.nombre)+'</span>'+esc(u.nombre)+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>';
+}).join('');
+$('#lgUsuarios').addEventListener('click',function(ev){
+  var b=ev.target.closest('[data-usuario]');if(!b)return;
+  LG.usuario=USUARIOS.filter(function(u){return u.id===b.dataset.usuario;})[0];
+  try{localStorage.setItem('caja:ultimo',LG.usuario.id);}catch(e){}
+  errLogin('');pasoLogin(2);
+});
+$('#teclado').addEventListener('click',function(ev){var b=ev.target.closest('[data-tecla]');if(b)tecla(b.dataset.tecla);});
+$('#lgCambiar').addEventListener('click',function(){LG.usuario=null;errLogin('');pasoLogin(1);});
+$('#lgConCorreo').addEventListener('click',function(){errLogin('');pasoLogin(3);});
+$('#lgVolver').addEventListener('click',function(){errLogin('');pasoLogin(1);});
+document.addEventListener('keydown',function(e){
+  if($('#login').hidden||$('#lgPaso2').hidden)return;
+  if(/^\d$/.test(e.key)){e.preventDefault();tecla(e.key);}
+  else if(e.key==='Backspace'){e.preventDefault();tecla('borrar');}
+});
 $('#formLogin').addEventListener('submit',function(ev){
   ev.preventDefault();
   var m=$('#lgMail').value.trim(),p=$('#lgPass').value;
-  if(!m||!p){mostrarLogin('Escribe el correo y la contraseña.');return;}
-  var b=$('#lgBtn');b.disabled=true;b.textContent='Entrando…';$('#lgErr').hidden=true;
-  FB.auth.signInWithEmailAndPassword(m,p).catch(function(e){mostrarLogin(errorLogin(e&&e.code));});
+  if(!m||!p){errLogin('Escribe el correo y la contraseña.');return;}
+  var b=$('#lgBtn');b.disabled=true;b.textContent='Entrando…';errLogin('');
+  FB.auth.signInWithEmailAndPassword(m,p).catch(function(e){b.disabled=false;b.textContent='Entrar';errLogin(errorAuth(e&&e.code,false));});
 });
 
 /* ---------- Eventos ---------- */
@@ -1290,12 +1403,13 @@ try{
 if(FB.auth){
   FB.auth.onAuthStateChanged(function(u){
     if(!u){desconectar();aplicarRol();renderTodo();mostrarLogin();return;}
-    S.mail=u.email||'';
+    S.mail=u.email||'';S.nombre=nombreDeCorreo(S.mail);
     FB.db.collection('usuarios').doc(u.uid).get().then(function(d){
       var rol=d.exists&&d.data().rol;
-      if(!rol){FB.auth.signOut();mostrarLogin('Esa cuenta no tiene rol asignado en Firebase.');return;}
+      if(!rol){FB.auth.signOut();mostrarLogin('Esta cuenta no tiene rol asignado en Firebase.');return;}
       S.rol=rol==='admin'?'admin':'caja';
-      $('#login').hidden=true;$('#lgPass').value='';
+      $('#login').hidden=true;$('#lgPass').value='';LG.pin='';LG.enviando=false;pintarPin();errLogin('');
+      var cb=$('#btnCuenta');cb.innerHTML='<span class="cuenta-btn">'+esc(inicial(S.nombre))+'</span>';cb.setAttribute('aria-label','Mi cuenta: '+S.nombre);
       aplicarRol();
       setVista(S.vista,true);
       conectar();

@@ -345,7 +345,8 @@ label.campo{display:block;font-size:13px;font-weight:650;color:var(--muted);marg
 
 /* ===== Productos ===== */
 .p-grupo{margin-bottom:18px}
-.p-grupo h3{display:flex;align-items:center;gap:8px}
+.p-grupo h3{display:flex;align-items:center;gap:8px;margin:0}
+.p-grupo-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .p-grupo h3 i{width:9px;height:9px;border-radius:50%;background:var(--cat)}
 .p-caja{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .p-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 16px;gap:4px 14px;align-items:center;padding:13px 16px;background:none;border:0;text-align:left}
@@ -1151,7 +1152,7 @@ function renderProductos(){
   var t=tasa(),cats=catsOrdenadas(lista);
   el.innerHTML=cats.map(function(c){
     var ps=lista.filter(function(p){return catKey(p.categoria)===catKey(c);}).sort(function(a,b){return String(a.nombre).localeCompare(String(b.nombre),'es');});
-    return '<div class="p-grupo" style="--cat:var(--cat-'+catColor(c)+')"><h3><i></i>'+esc(c)+' · '+ps.length+'</h3><div class="p-caja">'+ps.map(function(p){
+    return '<div class="p-grupo" style="--cat:var(--cat-'+catColor(c)+')"><div class="p-grupo-h"><h3><i></i>'+esc(c)+' · '+ps.length+'</h3><button type="button" class="btn btn-ghost sm" data-renombrar="'+esc(c)+'" aria-label="Cambiar el nombre de la categoría '+esc(c)+'">Cambiar nombre</button></div><div class="p-caja">'+ps.map(function(p){
       var tags='';
       if(p.llevaStock)tags+='<span class="pill'+(estadoStock(p)==='ok'?'':estadoStock(p)==='bajo'?' warn':' bad')+'">Stock '+fmtInt.format(stockDe(p))+'</span>';
       if(p.activo===false)tags+='<span class="pill">Oculto en caja</span>';
@@ -1231,7 +1232,7 @@ function abrirProducto(id){
   if(!esAdmin())return;
   var p=id?S.productos.get(id):null;
   var cats=catsOrdenadas(productosLista());
-  ['Café','Bebidas','Nevera','Dulces','Comida'].forEach(function(c){if(!cats.some(function(x){return catKey(x)===catKey(c);}))cats.push(c);});
+  ['Café','Bebidas','Postres','Comida'].forEach(function(c){if(!cats.some(function(x){return catKey(x)===catKey(c);}))cats.push(c);});
   var html='<form id="formProd" class="pila" novalidate>'+
     '<div><label class="campo" for="f-nombre">Nombre</label><input class="inp" id="f-nombre" maxlength="60" autocomplete="off" placeholder="Ej.: Refresco en lata"></div>'+
     '<div class="dos">'+
@@ -1292,6 +1293,33 @@ function abrirProducto(id){
       cerrarModal();toast(p?'Cambios guardados':'Producto creado','ok');
     });
   });
+}
+function abrirRenombrarCat(cat){
+  if(!esAdmin()||!S.db)return;
+  var ps=productosLista().filter(function(p){return catKey(p.categoria)===catKey(cat);});
+  if(!ps.length)return;
+  abrirModal('Cambiar nombre',
+    '<form id="formCat" class="pila" novalidate>'+
+      '<div><label class="campo" for="rc-nombre">Nuevo nombre de “'+esc(cat)+'”</label><input class="inp" id="rc-nombre" maxlength="30" autocomplete="off" placeholder="Ej.: Postres…">'+
+      '<span class="ayuda">Cambia en '+ps.length+(ps.length===1?' producto':' productos')+'. Si escribes el nombre de otra categoría, se unen. Las ventas pasadas no cambian.</span></div>'+
+      '<div class="err" id="rc-err" hidden></div>'+
+      '<div class="modal-acc"><button type="submit" class="btn btn-primary">Guardar nombre</button></div>'+
+    '</form>',
+    function(){
+      $('#rc-nombre').value=cat==='Sin categoría'?'':cat;
+      $('#formCat').addEventListener('submit',function(ev){
+        ev.preventDefault();
+        var nuevo=$('#rc-nombre').value.trim().replace(/\s+/g,' ');
+        if(!nuevo){var e=$('#rc-err');e.textContent='Escribe el nuevo nombre.';e.hidden=false;return;}
+        if(nuevo===cat){cerrarModal();return;}
+        var lote=S.db.batch();
+        ps.forEach(function(p){lote.update(S.db.collection(COL_PROD).doc(p.id),{categoria:nuevo});});
+        lote.commit().catch(function(er){toast('No se cambió el nombre. '+msgError(er),'bad');});
+        if(catKey(S.cat)===catKey(cat))S.cat=nuevo;
+        if(catKey(S.pickCat)===catKey(cat))S.pickCat=nuevo;
+        cerrarModal();toast('Listo: “'+cat+'” ahora se llama “'+nuevo+'”.','ok');
+      });
+    });
 }
 function importarAnterior(btn){
   if(!esAdmin()||!S.db)return;
@@ -1848,6 +1876,7 @@ document.addEventListener('click',function(ev){
   if((b=t.closest('[data-stock]'))){moverStock(b.dataset.stock,Number(b.dataset.d));return;}
   if((b=t.closest('[data-reponer]'))){abrirCantidad(b.dataset.reponer,'reponer');return;}
   if((b=t.closest('[data-contar]'))){abrirCantidad(b.dataset.contar,'contar');return;}
+  if((b=t.closest('[data-renombrar]'))){abrirRenombrarCat(b.dataset.renombrar);return;}
   if((b=t.closest('[data-editar]'))){abrirProducto(b.dataset.editar);return;}
 });
 $('#btnTasa').addEventListener('click',abrirTasa);

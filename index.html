@@ -116,7 +116,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* Navegación móvil */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
-.tabbar.cuatro{grid-template-columns:repeat(4,minmax(0,1fr))}
 .tabbar button{position:relative;border:0;background:none;height:var(--tab-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:650;color:var(--muted)}
 .tabbar button svg{width:23px;height:23px}
 .tabbar button[aria-current="page"]{color:var(--brand)}
@@ -499,7 +498,7 @@ button,.prod,.mesa,.chip,.metodo,a{touch-action:manipulation}
     <nav class="nav" aria-label="Secciones">
       <button type="button" data-vista="vender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h12v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 4v2M12 4v2"/><path d="M3 21h15"/></svg>Vender</button>
       <button type="button" data-vista="mesas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5h18"/><path d="M6 8.5V20M18 8.5V20"/><path d="M6 14h12"/><path d="M9 8.5 10 4h4l1 4.5"/></svg>Mesas</button>
-      <button type="button" data-vista="ventas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/></svg>Ventas</button>
+      <button type="button" data-vista="ventas" data-ventas><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/></svg>Ventas</button>
       <button type="button" data-vista="stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4v-9Z"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9"/></svg>Stock</button>
       <button type="button" data-vista="productos" data-admin><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.5V4h8.5l9 9-8.5 8.5-9-9Z"/><circle cx="8" cy="8.5" r="1.4"/></svg>Productos</button>
     </nav>
@@ -618,7 +617,7 @@ button,.prod,.mesa,.chip,.metodo,a{touch-action:manipulation}
 <nav class="tabbar" id="tabbar" aria-label="Secciones">
   <button type="button" data-vista="vender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h12v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 4v2M12 4v2"/><path d="M3 21h15"/></svg>Vender</button>
       <button type="button" data-vista="mesas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5h18"/><path d="M6 8.5V20M18 8.5V20"/><path d="M6 14h12"/><path d="M9 8.5 10 4h4l1 4.5"/></svg>Mesas</button>
-  <button type="button" data-vista="ventas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/></svg>Ventas</button>
+  <button type="button" data-vista="ventas" data-ventas><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/></svg>Ventas</button>
   <button type="button" data-vista="stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4v-9Z"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9"/></svg>Stock<span class="tab-alerta" id="tabAlerta" hidden></span></button>
   <button type="button" data-vista="productos" data-admin><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12.5V4h8.5l9 9-8.5 8.5-9-9Z"/><circle cx="8" cy="8.5" r="1.4"/></svg>Productos</button>
 </nav>
@@ -780,6 +779,11 @@ var S={
   abierta:null,confirmar:null
 };
 function esAdmin(){return S.rol==='admin';}
+/* Roles: admin (todo), empleado (vende, mesas, stock y productos; no ve ventas), caja (vende, mesas y stock) */
+var ROLES=['admin','empleado','caja'];
+function gestiona(){return S.rol==='admin'||S.rol==='empleado';}
+function veVentas(){return !!S.rol&&S.rol!=='empleado';}
+function nombreRol(r){return r==='admin'?'Administrador':r==='empleado'?'Empleado':'Caja';}
 S.pedidos=new Map();S.pedidosListos=false;S.pedidosError='';S.mesasCant=8;S.borrador=new Map();S.mesaActiva=null;S.mesaInfo=null;S.cobroMesa=null;S.elegir=null;S.mesaConfirma='';S.pickBuscar='';S.pickCat='Todas';
 
 function msgError(e){
@@ -798,7 +802,7 @@ function aviso(txt,tono){var a=$('#aviso');a.textContent=txt;a.className='aviso'
 function quitarAviso(){$('#aviso').hidden=true;S.avisoEsRol=false;}
 function avisoRol(){
   var raw=S.rolMalEscrito,limpio=String(raw).trim().toLowerCase();
-  aviso('El rol de '+S.nombre+' en Firebase dice “'+raw+'”'+(limpio==='admin'?', con mayúsculas, espacios o comillas de más':'')+'. Por eso entra como caja. Escríbelo exactamente admin o caja, en minúsculas.','bad');
+  aviso('El rol de '+S.nombre+' en Firebase dice “'+raw+'”'+(ROLES.indexOf(limpio)>-1?', con mayúsculas, espacios o comillas de más':'')+'. Por eso entra como caja. Escríbelo exactamente admin, empleado o caja, en minúsculas.','bad');
   S.avisoEsRol=true;
 }
 function renderSync(){
@@ -813,7 +817,7 @@ function renderSync(){
 var VISTAS=['vender','mesas','ventas','stock','productos'];
 function setVista(v,noHash){
   if(VISTAS.indexOf(v)<0)v='vender';
-  if(v==='productos'&&S.rol&&!esAdmin())v='vender';
+  if(S.rol&&((v==='productos'&&!gestiona())||(v==='ventas'&&!veVentas())))v='vender';
   S.vista=v;
   $$('[data-seccion]').forEach(function(s){s.hidden=s.dataset.seccion!==v;});
   $$('[data-vista]').forEach(function(b){if(b.dataset.vista===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -825,10 +829,12 @@ function setVista(v,noHash){
   window.scrollTo(0,0);
 }
 function aplicarRol(){
-  var admin=esAdmin();
-  $$('[data-admin]').forEach(function(el){el.hidden=!admin;});
-  $('#tabbar').classList.toggle('cuatro',!admin);
-  if(!admin&&S.vista==='productos')setVista('vender');
+  var g=gestiona(),vv=veVentas();
+  $$('[data-admin]').forEach(function(el){el.hidden=!g;});
+  $$('[data-ventas]').forEach(function(el){el.hidden=!vv;});
+  var n=$$('#tabbar > button').filter(function(b){return !b.hidden;}).length;
+  $('#tabbar').style.gridTemplateColumns='repeat('+n+',minmax(0,1fr))';
+  if((!g&&S.vista==='productos')||(!vv&&S.vista==='ventas'))setVista('vender');
 }
 
 /* ---------- Cálculos ---------- */
@@ -853,6 +859,7 @@ function renderTasa(){
 }
 function renderHoy(){
   $('#hoyFecha').textContent=fechaLarga(S.hoyId);
+  if(!veVentas()){$('#hoyNum').textContent='';return;}
   var vs=S.hoyDoc&&S.hoyDoc.ventas?Object.keys(S.hoyDoc.ventas).map(function(k){return S.hoyDoc.ventas[k];}):[];
   var val=vs.filter(function(v){return v&&!v.anulada;});
   var tot=val.reduce(function(a,v){return a+cents(v.total);},0)/100;
@@ -968,7 +975,7 @@ function renderCats(){
 }
 function vacioProductos(){
   if(S.faltanPermisos)return '<div class="vacio" style="grid-column:1/-1"><b>Faltan los permisos de la caja nueva</b>'+(esAdmin()?'Pega las reglas nuevas en Firebase: Firestore Database, pestaña Rules, y publica.':'Avísale al administrador.')+'</div>';
-  if(!esAdmin())return '<div class="vacio" style="grid-column:1/-1"><b>Todavía no hay productos</b>Pídele al administrador que los cargue.</div>';
+  if(!gestiona())return '<div class="vacio" style="grid-column:1/-1"><b>Todavía no hay productos</b>Pídele al administrador que los cargue.</div>';
   return '<div class="vacio" style="grid-column:1/-1"><b>Todavía no hay productos</b>Trae el menú del sistema anterior con sus precios o crea el primero.<div class="acc"><button type="button" class="btn btn-primary" data-accion="importar">Traer del sistema anterior</button><button type="button" class="btn btn-sec" data-accion="nuevo">+ Nuevo producto</button></div></div>';
 }
 function renderGrid(){
@@ -1205,7 +1212,7 @@ function renderStock(){
   var al=$('#tabAlerta');al.hidden=!(nAg+nBa);al.textContent=nAg+nBa;
   var res=$('#sResumen'),el=$('#sLista');
   if(!S.productosListos&&!S.productos.size){res.innerHTML='';el.innerHTML='<div class="vacio"><b>Cargando…</b></div>';return;}
-  if(!lista.length){res.innerHTML='';el.innerHTML='<div class="vacio"><b>Ningún producto lleva stock todavía</b>'+(esAdmin()?'Crea o edita un producto, por ejemplo Refresco en lata, y activa “Llevar stock”.<div class="acc"><button type="button" class="btn btn-primary" data-accion="nuevo">+ Nuevo producto</button></div>':'El administrador lo activa en cada producto.')+'</div>';return;}
+  if(!lista.length){res.innerHTML='';el.innerHTML='<div class="vacio"><b>Ningún producto lleva stock todavía</b>'+(gestiona()?'Crea o edita un producto, por ejemplo Refresco en lata, y activa “Llevar stock”.<div class="acc"><button type="button" class="btn btn-primary" data-accion="nuevo">+ Nuevo producto</button></div>':'El administrador lo activa en cada producto.')+'</div>';return;}
   res.innerHTML='<span class="pill">'+lista.length+(lista.length===1?' producto':' productos')+'</span>'+(nBa?'<span class="pill warn">'+nBa+' por reponer</span>':'')+(nAg?'<span class="pill bad">'+nAg+(nAg===1?' agotado':' agotados')+'</span>':'')+(!nAg&&!nBa?'<span class="pill ok">Todo en orden</span>':'');
   el.innerHTML=lista.map(function(p){
     var est=estadoStock(p),pill=est==='agotado'?'<span class="pill bad">Agotado</span>':est==='bajo'?'<span class="pill warn">Reponer</span>':'<span class="pill ok">Bien</span>';
@@ -1303,7 +1310,7 @@ function abrirTasa(){
 /* ---------- Cuenta ---------- */
 function abrirCuenta(){
   abrirModal('Mi cuenta',
-    '<div class="pila"><div class="cuenta-info lg-quien"><span class="avatar">'+esc(inicial(S.nombre))+'</span><div><span class="r-lbl">'+(esAdmin()?'Administrador':'Caja')+'</span><b>'+esc(S.nombre||S.mail||'—')+'</b></div></div>'+
+    '<div class="pila"><div class="cuenta-info lg-quien"><span class="avatar">'+esc(inicial(S.nombre))+'</span><div><span class="r-lbl">'+esc(nombreRol(S.rol))+'</span><b>'+esc(S.nombre||S.mail||'—')+'</b></div></div>'+
     (esAdmin()?'<p class="muted" style="margin:0">El sistema anterior, con recetas, gastos y cierres, sigue disponible en <a href="/anterior.html" style="color:var(--brand)">ciao-caffe-amber.vercel.app/anterior.html</a>.</p>':'')+
     '<div class="modal-acc"><button type="button" class="btn btn-primary" id="c-cambiar">Cambiar de usuario</button></div></div>',
     function(){$('#c-cambiar').addEventListener('click',function(){cerrarModal();LG.iniciado=true;LG.usuario=null;errLogin('');pasoLogin(1);FB.auth.signOut();});});
@@ -1311,7 +1318,7 @@ function abrirCuenta(){
 
 /* ---------- Productos ---------- */
 function abrirProducto(id){
-  if(!esAdmin())return;
+  if(!gestiona())return;
   var p=id?S.productos.get(id):null;
   var cats=catsOrdenadas(productosLista());
   ['Combos','Café','Bebidas','Postres','Comida'].forEach(function(c){if(!cats.some(function(x){return catKey(x)===catKey(c);}))cats.push(c);});
@@ -1452,7 +1459,7 @@ function abrirProducto(id){
   });
 }
 function abrirRenombrarCat(cat){
-  if(!esAdmin()||!S.db)return;
+  if(!gestiona()||!S.db)return;
   var ps=productosLista().filter(function(p){return catKey(p.categoria)===catKey(cat);});
   if(!ps.length)return;
   abrirModal('Cambiar nombre',
@@ -1479,7 +1486,7 @@ function abrirRenombrarCat(cat){
     });
 }
 function importarAnterior(btn){
-  if(!esAdmin()||!S.db)return;
+  if(!gestiona()||!S.db)return;
   if(btn){btn.disabled=true;btn.textContent='Trayendo…';}
   S.db.collection('productos').get().then(function(qs){
     var lote=S.db.batch(),n=0;
@@ -1558,7 +1565,7 @@ function infoPedido(key){
 
 function renderMesas(){
   var grid=$('#mesasGrid'),res=$('#mesasResumen'),prep=$('#mesasPrep');
-  $('#btnAjustarMesas').hidden=!esAdmin();
+  $('#btnAjustarMesas').hidden=!gestiona();
   if(S.pedidosError){
     res.textContent='';prep.hidden=true;
     grid.innerHTML='<div class="vacio" style="grid-column:1/-1"><b>'+(S.pedidosError==='permisos'?'Faltan los permisos de Mesas':'No se pudieron cargar las mesas')+'</b>'+
@@ -1808,7 +1815,7 @@ function abrirLlevar(){
     });});
 }
 function abrirAjustarMesas(){
-  if(!esAdmin())return;
+  if(!gestiona())return;
   abrirModal('Mesas del local',
     '<form id="formMesas" class="pila" novalidate><div><label class="campo" for="ms-cant">¿Cuántas mesas hay?</label><input class="inp" id="ms-cant" inputmode="numeric" autocomplete="off" value="'+S.mesasCant+'">'+
     '<span class="ayuda">Se numeran de la 1 en adelante. Los pedidos para llevar van aparte.</span></div><div class="err" id="ms-err" hidden></div>'+
@@ -1825,16 +1832,16 @@ function abrirAjustarMesas(){
 /* ---------- Suscripciones ---------- */
 var subs=[],unsubHoy=null,unsubRango=null,timerRango=null,timerConexion=null;
 function suscribirHoy(){
-  if(!S.db)return;
-  if(unsubHoy)unsubHoy();
+  if(unsubHoy){unsubHoy();unsubHoy=null;}
   S.hoyId=hoy();S.hoyDoc=null;
+  if(!S.db||!veVentas())return;
   unsubHoy=S.db.collection(COL_VENT).doc(S.hoyId).onSnapshot({includeMetadataChanges:true},function(d){
     S.hoyDoc=d.exists?d.data():null;S.pendientes=d.metadata.hasPendingWrites;renderHoy();renderSync();
   },function(){});
 }
 function suscribirRango(){
-  if(!S.db)return;
-  if(unsubRango)unsubRango();
+  if(unsubRango){unsubRango();unsubRango=null;}
+  if(!S.db||!veVentas())return;
   clearTimeout(timerRango);
   S.rango=rangoActual();S.ventasRango=[];S.rangoListo=false;S.rangoLento=false;S.rangoError='';S.abierta=null;S.confirmar=null;
   var a=S.rango[0],b=S.rango[1];
@@ -2095,16 +2102,16 @@ if(FB.auth){
       }
       var limpio=String(raw).trim().toLowerCase();
       var antes=S.rol;
-      S.rol=raw==='admin'?'admin':'caja';
-      S.rolMalEscrito=(raw!=='admin'&&raw!=='caja')?String(raw):'';
+      S.rol=ROLES.indexOf(raw)>-1?raw:'caja';
+      S.rolMalEscrito=ROLES.indexOf(raw)<0?String(raw):'';
       if(primero){
         primero=false;
         $('#login').hidden=true;$('#lgPass').value='';LG.pin='';LG.enviando=false;pintarPin();errLogin('');
         var cb=$('#btnCuenta');cb.innerHTML='<span class="cuenta-btn">'+esc(inicial(S.nombre))+'</span>';cb.setAttribute('aria-label','Mi cuenta: '+S.nombre);
         aplicarRol();setVista(S.vista,true);conectar();
       }else if(antes!==S.rol){
-        aplicarRol();renderTodo();
-        toast(S.rol==='admin'?'Ahora entras como administrador.':'Ahora entras como caja.','ok');
+        aplicarRol();suscribirHoy();suscribirRango();renderTodo();
+        toast('Ahora entras como '+nombreRol(S.rol).toLowerCase()+'.','ok');
       }
       if(S.rolMalEscrito)avisoRol();
       else if(S.avisoEsRol){S.avisoEsRol=false;quitarAviso();}

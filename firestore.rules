@@ -11,6 +11,10 @@ service cloud.firestore {
     function admin() {
       return auth() && rol() == 'admin';
     }
+    // Empleado: vende, toma pedidos, maneja stock y productos; no ve ventas
+    function gestiona() {
+      return auth() && (rol() == 'admin' || rol() == 'empleado');
+    }
 
     match /usuarios/{uid} {
       allow read: if auth() && request.auth.uid == uid;
@@ -29,19 +33,20 @@ service cloud.firestore {
 
     // ===== Caja nueva (index.html) =====
 
-    // Productos: solo el admin crea, edita y borra.
+    // Productos: admin y empleado crean, editan y borran.
     // La caja solo puede mover el stock (vender, reponer, contar).
     match /caja_productos/{doc} {
       allow read: if auth();
-      allow create, delete: if admin();
-      allow update: if admin()
+      allow create, delete: if gestiona();
+      allow update: if gestiona()
         || (auth() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock']));
     }
 
-    // Ventas: un documento por día. La caja solo puede AGREGAR ventas;
+    // Ventas: un documento por día. El empleado no las puede leer.
+    // Caja y empleado solo pueden AGREGAR ventas (cobrar);
     // anular o cambiar una venta ya hecha queda para el admin.
     match /caja_ventas/{dia} {
-      allow read: if auth();
+      allow read: if auth() && rol() != 'empleado';
       allow create: if auth();
       allow update: if admin()
         || (auth()
@@ -57,10 +62,10 @@ service cloud.firestore {
       allow read, write: if auth();
     }
 
-    // Ajustes de la caja (cantidad de mesas): solo el admin los cambia.
+    // Ajustes de la caja (cantidad de mesas): admin y empleado.
     match /caja_config/{doc} {
       allow read: if auth();
-      allow write: if admin();
+      allow write: if gestiona();
     }
 
     // ===== Sistema anterior (anterior.html) =====
